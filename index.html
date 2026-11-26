@@ -1,0 +1,718 @@
+<!DOCTYPE html><html lang="he" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>איקס-עיגול קוראים ומנצחים</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Rubik -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #fef3c7 100%);
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Winning sequence blink animation lasting exactly 5 seconds total */
+        @keyframes winningBlink {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.08); filter: brightness(1.25); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); }
+        }
+
+        .animate-winning-line {
+            animation: winningBlink 0.5s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        .cell-btn {
+            transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 0.75rem;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .cell-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .option-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.left-4{left:1rem}.z-10{z-index:10}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-2{margin-top:0.5rem;margin-bottom:0.5rem}.my-auto{margin-top:auto;margin-bottom:auto}.mb-1{margin-bottom:0.25rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mb-2\.5{margin-bottom:0.625rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-5{margin-bottom:1.25rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mt-16{margin-top:4rem}.mt-3{margin-top:0.75rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-20{height:5rem}.h-full{height:100%}.min-h-\[220px\]{min-height:220px}.min-h-\[460px\]{min-height:460px}.min-h-screen{min-height:100vh}.w-20{width:5rem}.w-full{width:100%}.max-w-5xl{max-width:64rem}.max-w-sm{max-width:24rem}.max-w-xl{max-width:36rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%, 100%{transform:translateY(-25%);animation-timing-function:cubic-bezier(0.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,0.2,1)}}.animate-bounce{animation:bounce 1s infinite}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-3\.5{gap:0.875rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.overflow-hidden{overflow:hidden}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-4{border-width:4px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-amber-300{--tw-border-opacity:1;border-color:rgb(252 211 77 / var(--tw-border-opacity, 1))}.border-amber-400{--tw-border-opacity:1;border-color:rgb(251 191 36 / var(--tw-border-opacity, 1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-indigo-200{--tw-border-opacity:1;border-color:rgb(199 210 254 / var(--tw-border-opacity, 1))}.border-rose-100{--tw-border-opacity:1;border-color:rgb(255 228 230 / var(--tw-border-opacity, 1))}.border-sky-100{--tw-border-opacity:1;border-color:rgb(224 242 254 / var(--tw-border-opacity, 1))}.border-sky-400{--tw-border-opacity:1;border-color:rgb(56 189 248 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-amber-50\/90{background-color:rgb(255 251 235 / 0.9)}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-sky-100{--tw-bg-opacity:1;background-color:rgb(224 242 254 / var(--tw-bg-opacity, 1))}.bg-sky-200\/50{background-color:rgb(186 230 253 / 0.5)}.bg-sky-50{--tw-bg-opacity:1;background-color:rgb(240 249 255 / var(--tw-bg-opacity, 1))}.bg-sky-50\/90{background-color:rgb(240 249 255 / 0.9)}.bg-sky-500{--tw-bg-opacity:1;background-color:rgb(14 165 233 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-white\/95{background-color:rgb(255 255 255 / 0.95)}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-emerald-500{--tw-gradient-from:#10b981 var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-sky-500{--tw-gradient-from:#0ea5e9 var(--tw-gradient-from-position);--tw-gradient-to:rgb(14 165 233 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-indigo-600{--tw-gradient-to:#4f46e5 var(--tw-gradient-to-position)}.to-teal-600{--tw-gradient-to:#0d9488 var(--tw-gradient-to-position)}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-7{padding:1.75rem}.px-10{padding-left:2.5rem;padding-right:2.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-6{padding-bottom:1.5rem}.pt-2{padding-top:0.5rem}.text-center{text-align:center}.text-right{text-align:right}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-wide{letter-spacing:0.025em}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-amber-900{--tw-text-opacity:1;color:rgb(120 53 15 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-sky-500{--tw-text-opacity:1;color:rgb(14 165 233 / var(--tw-text-opacity, 1))}.text-sky-600{--tw-text-opacity:1;color:rgb(2 132 199 / var(--tw-text-opacity, 1))}.text-sky-700{--tw-text-opacity:1;color:rgb(3 105 161 / var(--tw-text-opacity, 1))}.text-sky-900{--tw-text-opacity:1;color:rgb(12 74 110 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:bg-amber-200:hover{--tw-bg-opacity:1;background-color:rgb(253 230 138 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-600:hover{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.hover\:bg-sky-100:hover{--tw-bg-opacity:1;background-color:rgb(224 242 254 / var(--tw-bg-opacity, 1))}.hover\:bg-sky-600:hover{--tw-bg-opacity:1;background-color:rgb(2 132 199 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.hover\:bg-white:hover{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.hover\:from-emerald-600:hover{--tw-gradient-from:#059669 var(--tw-gradient-from-position);--tw-gradient-to:rgb(5 150 105 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-sky-600:hover{--tw-gradient-from:#0284c7 var(--tw-gradient-from-position);--tw-gradient-to:rgb(2 132 199 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-indigo-700:hover{--tw-gradient-to:#4338ca var(--tw-gradient-to-position)}.hover\:to-teal-700:hover{--tw-gradient-to:#0f766e var(--tw-gradient-to-position)}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@media (min-width: 640px){.sm\:left-6{left:1.5rem}.sm\:mt-20{margin-top:5rem}.sm\:gap-3{gap:0.75rem}.sm\:p-6{padding:1.5rem}.sm\:p-8{padding:2rem}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-6xl{font-size:3.75rem;line-height:1}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 768px){.md\:w-1\/2{width:50%}.md\:flex-row{flex-direction:row}.md\:text-4xl{font-size:2.25rem;line-height:2.5rem}}</style></head>
+<body class="min-h-screen flex flex-col justify-between items-center px-4 py-2 text-slate-800 select-none">
+
+    <!-- Header positioned slightly lower (closer to center) -->
+    <header class="w-full max-w-5xl flex justify-center items-center bg-white/90 rounded-2xl px-4 py-3.5 shadow-md mt-16 sm:mt-20 mb-1.5 border border-sky-100 relative">
+        <div class="text-center">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-sky-900 leading-tight">איקס-עיגול קוראים ומנצחים</h1>
+        </div>
+        <div id="game-info-bar" class="hidden flex items-center gap-2 sm:gap-3 absolute left-4 sm:left-6">
+            <div id="level-badge" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border border-indigo-200">
+                רמה 1
+            </div>
+            <div id="mode-badge" class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border border-emerald-200">
+                <i class="fa-solid fa-robot ml-1"></i> מול המחשב
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-5xl flex-1 flex flex-col justify-center items-center py-0.5 my-auto">
+
+        <!-- Setup Screen -->
+        <section id="setup-screen" class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-8 shadow-2xl text-center animate-pop-in my-auto">
+            <!-- Mode Selection -->
+            <div class="mb-5 text-right">
+                <label class="block font-bold text-slate-700 mb-2.5 text-base sm:text-lg">
+                    <i class="fa-solid fa-users text-sky-500 ml-1"></i> בחרו מצב משחק:
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="mode-vs-computer" onclick="selectMode('vs-computer')" class="mode-btn p-4 rounded-2xl border-2 border-sky-400 bg-sky-50 text-sky-900 font-bold flex flex-col items-center gap-2 hover:bg-sky-100 transition shadow-sm text-base cursor-pointer">
+                        <i class="fa-solid fa-robot text-2xl text-sky-500"></i>
+                        <span>מול המחשב</span>
+                    </button>
+                    <button id="mode-vs-friend" onclick="selectMode('vs-friend')" class="mode-btn p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center gap-2 hover:bg-slate-50 transition shadow-sm text-base cursor-pointer">
+                        <i class="fa-solid fa-user-group text-2xl text-emerald-500"></i>
+                        <span>משחק עם חבר</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Level Selection -->
+            <div class="mb-6 text-right">
+                <label class="block font-bold text-slate-700 mb-2.5 text-base sm:text-lg">
+                    <i class="fa-solid fa-layer-group text-amber-500 ml-1"></i> בחרו רמה:
+                </label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button id="lvl-1" onclick="selectLevel(1)" class="lvl-btn p-3.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 font-bold text-base sm:text-lg flex items-center justify-center cursor-pointer shadow-sm">
+                        <span>רמה 1</span>
+                    </button>
+                    <button id="lvl-2" onclick="selectLevel(2)" class="lvl-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-base sm:text-lg flex items-center justify-center cursor-pointer shadow-sm">
+                        <span>רמה 2</span>
+                    </button>
+                    <button id="lvl-3" onclick="selectLevel(3)" class="lvl-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-base sm:text-lg flex items-center justify-center cursor-pointer shadow-sm">
+                        <span>רמה 3</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xl font-extrabold py-4 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-play"></i> להתחלת המשחק
+            </button>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="game-screen" class="hidden w-full flex flex-col md:flex-row gap-5 items-stretch max-w-5xl justify-center my-auto">
+
+            <!-- SIDE A: Tic-Tac-Toe Board -->
+            <div class="w-full md:w-1/2 glass-card rounded-3xl p-5 shadow-xl flex flex-col justify-between items-center">
+                <!-- Turn Indicator & Hearts Container -->
+                <div class="w-full flex justify-between items-center mb-3 bg-sky-50/90 px-4 py-2.5 rounded-2xl border border-sky-100">
+                    <div id="turn-indicator" class="flex items-center gap-2 font-bold text-sky-900 text-base sm:text-lg">
+                        <!-- Populated by JS -->
+                    </div>
+                    <!-- 2 Hearts Life Indicator -->
+                    <div class="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-xl shadow-inner border border-rose-100">
+                        <span class="text-xs sm:text-sm font-bold text-slate-500 ml-1">חיים:</span>
+                        <i id="heart-1" class="fa-solid fa-heart text-slate-300 text-lg sm:text-xl transition-all duration-300"></i>
+                        <i id="heart-2" class="fa-solid fa-heart text-slate-300 text-lg sm:text-xl transition-all duration-300"></i>
+                    </div>
+                </div>
+
+                <!-- 3x3 Tic-Tac-Toe Grid -->
+                <div class="board-grid p-3 bg-sky-200/50 rounded-2xl shadow-inner my-auto flex-shrink-0">
+                    <button onclick="handleCellClick(0)" id="cell-0" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(1)" id="cell-1" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(2)" id="cell-2" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(3)" id="cell-3" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(4)" id="cell-4" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(5)" id="cell-5" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(6)" id="cell-6" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(7)" id="cell-7" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                    <button onclick="handleCellClick(8)" id="cell-8" class="cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black text-sky-600 flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer"></button>
+                </div>
+
+                <div id="board-instruction" class="text-sm sm:text-base text-slate-500 font-medium text-center mt-3">
+                    לחצו על משבצת ריקה לקבלת משימת קריאה
+                </div>
+            </div>
+
+            <!-- SIDE B: Reading Task Panel -->
+            <div id="task-panel" class="w-full md:w-1/2 glass-card rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col justify-between relative overflow-hidden min-h-[460px]">
+                
+                <!-- Overlay when no cell selected -->
+                <div id="task-placeholder" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 text-4xl mb-4 animate-bounce shadow-inner">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-2">תורך לבחור משבצת!</h3>
+                    <p class="text-lg text-slate-500">לחצו על משבצת בלוח כדי לקבל משפט לקריאה</p>
+                </div>
+
+                <!-- Sentence Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-2.5">
+                        <span class="text-xs sm:text-sm font-bold text-sky-700 bg-sky-100 px-3 py-1 rounded-md">משימת קריאה</span>
+                        <button onclick="speakCurrentSentence()" class="bg-amber-100 text-amber-800 hover:bg-amber-200 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>הקרא משפט</span>
+                        </button>
+                    </div>
+
+                    <!-- The Sentence Container -->
+                    <div class="bg-amber-50/90 border-2 border-amber-200 rounded-2xl p-4 mb-4 text-center shadow-inner">
+                        <h2 id="sentence-text" class="text-3xl sm:text-4xl font-black text-slate-800 tracking-wide leading-relaxed">
+                            -- טוען משפט --
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- Reading Step Action or Image Options Section -->
+                <div id="reading-step-container" class="flex-1 flex flex-col justify-center items-center">
+                    <!-- Initially show "I finished reading" button -->
+                    <div id="finished-reading-wrapper" class="w-full flex flex-col items-center justify-center my-auto">
+                        <button onclick="showImageOptions()" class="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white text-xl sm:text-2xl font-extrabold px-10 py-4 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 flex items-center gap-3 cursor-pointer">
+                            <i class="fa-solid fa-circle-check text-2xl sm:text-3xl"></i>
+                            <span>סיימתי לקרוא</span>
+                        </button>
+                        <p class="text-slate-500 text-base mt-3 font-medium">קראו בקול רם ולחצו כאשר סיימתי</p>
+                    </div>
+
+                    <!-- Image Options Section (Hidden until "Finished reading" clicked) -->
+                    <div id="images-selection-wrapper" class="hidden w-full flex-1 flex flex-col justify-center">
+                        <p class="text-lg font-bold text-slate-700 mb-3 text-center">איזו תמונה מתאימה למשפט?</p>
+                        <div class="grid grid-cols-3 gap-3.5 min-h-[220px]" id="options-container">
+                            <!-- Options generated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Message Banner -->
+                <div id="feedback-banner" class="hidden my-2 p-2.5 rounded-xl text-center font-bold text-lg transition animate-pop-in">
+                    <!-- Text inserted dynamically -->
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Bottom buttons shifted slightly higher -->
+    <footer class="w-full max-w-5xl flex justify-between items-center pb-6 pt-2">
+        <button onclick="returnToMenu()" class="bg-white/90 hover:bg-white text-slate-700 font-bold px-4.5 py-2.5 rounded-xl shadow-sm text-sm sm:text-base border border-slate-200 flex items-center gap-2 transition cursor-pointer">
+            <i class="fa-solid fa-house"></i>
+            <span>מסך ראשי</span>
+        </button>
+
+        <button onclick="restartGame()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md text-sm sm:text-base border border-sky-400 flex items-center gap-2 transition active:scale-95 cursor-pointer">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>משחק חדש</span>
+        </button>
+    </footer>
+
+    <!-- Modal Screen -->
+    <div id="modal-screen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card bg-white rounded-3xl p-7 max-w-sm w-full text-center shadow-2xl animate-pop-in border-4 border-amber-300">
+            <div id="modal-icon" class="w-18 h-18 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 shadow-lg">
+                🏆
+            </div>
+            <h2 id="modal-title" class="text-2xl sm:text-3xl font-black text-slate-800 mb-1">כל הכבוד!</h2>
+            <p id="modal-desc" class="text-slate-600 text-base font-medium mb-6">מנצח הגדול של המשחק!</p>
+
+            <div class="flex gap-3 justify-center">
+                <button onclick="restartGame()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3.5 rounded-2xl shadow-lg transition active:scale-95 text-base flex-1 cursor-pointer">
+                    משחק נוסף <i class="fa-solid fa-arrow-left ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SENTENCES_DB = {
+            level1: [
+                { sentence: "דַיְסָה חַמָה", correct: "images1/img-031.webp", dist1: "images1/img-018.webp", dist2: "images1/img-030.webp" },
+                { sentence: "הַבְּרָכָה בַּמַעֲטָפָה", correct: "images1/img-029.webp", dist1: "images1/img-017.webp", dist2: "images2/img-073.webp" },
+                { sentence: "סַחְלָב לָבָן", correct: "images2/img-083.webp", dist1: "images2/img-074.webp", dist2: "images1/img-040.webp" },
+                { sentence: "הַכְּלַבְלַב נָבַח", correct: "images1/img-006.webp", dist1: "images1/img-046.webp", dist2: "images1/img-016.webp" },
+                { sentence: "הָעַכְבָּר בָּרַח", correct: "images1/img-025.webp", dist1: "images1/img-041.webp", dist2: "images2/img-056.webp" },
+                { sentence: "מָרָק חַם", correct: "images2/img-059.webp", dist1: "images2/img-062.webp", dist2: "images1/img-039.webp" },
+                { sentence: "קַלְמָר לָבָן", correct: "images1/img-009.webp", dist1: "images1/img-048.webp", dist2: "images2/img-080.webp" },
+                { sentence: "הַפָּרָה בַּחַוָה", correct: "images2/img-094.webp", dist1: "images1/img-038.webp", dist2: "images2/img-066.webp" }
+            ],
+            level2: [
+                { sentence: "הָדָר אָכַל מָרָק", correct: "images1/img-008.webp", dist1: "images1/img-049.webp", dist2: "images1/img-020.webp" },
+                { sentence: "הַקַרְנַף הָלַךְ לְאַט", correct: "images2/img-102.webp", dist1: "images1/img-053.webp", dist2: "images2/img-100.webp" },
+                { sentence: "דָנָה אָכְלָה אָנָנָס", correct: "images2/img-089.webp", dist1: "images1/img-054.webp", dist2: "images1/img-015.webp" },
+                { sentence: "בַּרְוָז שָׂחָה בַּנָהָר", correct: "images1/img-010.webp", dist1: "images2/img-091.webp", dist2: "images2/img-071.webp" },
+                { sentence: "נָדָב קָנָה בָּנָנָה", correct: "images1/img-019.webp", dist1: "images2/img-095.webp", dist2: "images1/img-034.webp" },
+                { sentence: "מָיָה בַּת אַרְבַּע", correct: "images1/img-011.webp", dist1: "images1/img-021.webp", dist2: "images1/img-045.webp" },
+                { sentence: "הַמַחֲבַת עַל הַמַדָף", correct: "images1/img-003.webp", dist1: "images1/img-052.webp", dist2: "images1/img-036.webp" },
+                { sentence: "דַלְיָה שָׁטְפָה צַלַחַת", correct: "images2/img-078.webp", dist1: "images2/img-064.webp", dist2: "images1/img-037.webp" },
+                { sentence: "פָּרָה רָצָה בַּחַוָה", correct: "images1/img-043.webp", dist1: "images2/img-077.webp", dist2: "images2/img-070.webp" },
+                { sentence: "רַן שָׁבַר צַלַחַת", correct: "images1/img-012.webp", dist1: "images1/img-044.webp", dist2: "images2/img-097.webp" },
+                { sentence: "הַדַיָג תָפַס דָג", correct: "images2/img-072.webp", dist1: "images2/img-065.webp", dist2: "images2/img-075.webp" },
+                { sentence: "מָיָה חָתְכָה בָּצָל", correct: "images1/img-001.webp", dist1: "images2/img-106.webp", dist2: "images1/img-028.webp" },
+                { sentence: "דְלַעַת צָמְחָה בַּגַן", correct: "images2/img-092.webp", dist1: "images2/img-096.webp", dist2: "images2/img-108.webp" },
+                { sentence: "הַדַוָר לָקַח מִכְתָב", correct: "images2/img-107.webp", dist1: "images2/img-104.webp", dist2: "images2/img-098.webp" },
+                { sentence: "הַגָמָל אָכַל קַשׁ", correct: "images2/img-082.webp", dist1: "images1/img-033.webp", dist2: "images2/img-081.webp" }
+            ],
+            level3: [
+                { sentence: "אַרְנָב קָטָן אָכַל חַסָה", correct: "images2/img-101.webp", dist1: "images1/img-042.webp", dist2: "images1/img-051.webp" },
+                { sentence: "דַפְנָה יָשְׁבָה עַל סַפְסָל", correct: "images1/img-024.webp", dist1: "images2/img-093.webp", dist2: "images1/img-023.webp" },
+                { sentence: "דָנָה אָכְלָה חַלָה קְטַנָה", correct: "images2/img-103.webp", dist1: "images2/img-079.webp", dist2: "images2/img-068.webp" },
+                { sentence: "דָן עָמַד עַל גַלְשָׁן", correct: "images1/img-007.webp", dist1: "images1/img-013.webp", dist2: "images2/img-105.webp" },
+                { sentence: "אָנָה רָקְדָה עַל הַבָּמָה", correct: "images2/img-087.webp", dist1: "images1/img-035.webp", dist2: "images2/img-086.webp" },
+                { sentence: "הַיַרְקָן נָתַן לְחָנָן גַמְבָּה", correct: "images2/img-057.webp", dist1: "images2/img-060.webp", dist2: "images2/img-076.webp" },
+                { sentence: "סָבְתָא אָפְתָה חַלָה לְשַׁבָּת", correct: "images1/img-027.webp", dist1: "images1/img-004.webp", dist2: "images1/img-026.webp" },
+                { sentence: "נַעֲמָה שָׁבְרָה כַּד חָדָשׁ", correct: "images2/img-055.webp", dist1: "images2/img-069.webp", dist2: "images1/img-005.webp" },
+                { sentence: "סַבָּא קָנָה לְטַל קַלְמָר", correct: "images2/img-085.webp", dist1: "images2/img-061.webp", dist2: "images1/img-032.webp" },
+                { sentence: "גַלְיָה לָקְחָה גַלְגַל יָם", correct: "images1/img-014.webp", dist1: "images1/img-032.webp", dist2: "images2/img-067.webp" },
+                { sentence: "דָנָה חָלְמָה עַל פַּרְפַּר", correct: "images1/img-050.webp", dist1: "images2/img-090.webp", dist2: "images2/img-084.webp" },
+                { sentence: "הַיַלְדָה רָאֲתָה עַקְרָב קָטָן", correct: "images2/img-058.webp", dist1: "images1/img-047.webp", dist2: "images1/img-002.webp" },
+                { sentence: "נָחָשׁ זָחַל עַל הַיָד", correct: "images2/img-063.webp", dist1: "images2/img-090.webp", dist2: "images2/img-084.webp" },
+                { sentence: "עֲנָת תָלְתָה עַרְסָל", correct: "images2/img-099.webp", dist1: "images2/img-088.webp", dist2: "images1/img-022.webp" }
+            ]
+        };
+
+        const WINNING_COMBOS = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        // State Variables
+        let selectedMode = 'vs-computer';
+        let selectedLevel = 1;
+        let boardState = Array(9).fill(null);
+        let currentPlayer = 'X';
+        let activeCellIndex = null;
+        let currentChallenge = null;
+        let livesLeft = 2;
+        let isGameActive = false;
+        let winningComboIndices = [];
+
+        // Persistent queue across games for the selected level
+        let levelQueues = {
+            1: [],
+            2: [],
+            3: []
+        };
+
+        function selectMode(mode) {
+            selectedMode = mode;
+            const compBtn = document.getElementById('mode-vs-computer');
+            const friendBtn = document.getElementById('mode-vs-friend');
+
+            if (mode === 'vs-computer') {
+                compBtn.className = 'mode-btn p-4 rounded-2xl border-2 border-sky-400 bg-sky-50 text-sky-900 font-bold flex flex-col items-center gap-2 hover:bg-sky-100 transition shadow-sm text-base cursor-pointer';
+                friendBtn.className = 'mode-btn p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center gap-2 hover:bg-slate-50 transition shadow-sm text-base cursor-pointer';
+            } else {
+                friendBtn.className = 'mode-btn p-4 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-900 font-bold flex flex-col items-center gap-2 hover:bg-emerald-100 transition shadow-sm text-base cursor-pointer';
+                compBtn.className = 'mode-btn p-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-bold flex flex-col items-center gap-2 hover:bg-slate-50 transition shadow-sm text-base cursor-pointer';
+            }
+        }
+
+        function selectLevel(lvl) {
+            selectedLevel = lvl;
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`lvl-${i}`);
+                if (i === lvl) {
+                    btn.className = 'lvl-btn p-3.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-900 font-bold text-base sm:text-lg flex items-center justify-center cursor-pointer shadow-sm';
+                } else {
+                    btn.className = 'lvl-btn p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-base sm:text-lg flex items-center justify-center cursor-pointer shadow-sm';
+                }
+            }
+        }
+
+        function startGame() {
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-info-bar').classList.remove('hidden');
+
+            document.getElementById('level-badge').innerText = `רמה ${selectedLevel}`;
+            const modeBadge = document.getElementById('mode-badge');
+            if (selectedMode === 'vs-computer') {
+                modeBadge.className = 'bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border border-emerald-200';
+                modeBadge.innerHTML = `<i class="fa-solid fa-robot ml-1"></i> מול המחשב`;
+            } else {
+                modeBadge.className = 'bg-sky-100 text-sky-700 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border border-sky-200';
+                modeBadge.innerHTML = `<i class="fa-solid fa-user-group ml-1"></i> משחק עם חבר`;
+            }
+
+            restartGame();
+        }
+
+        function returnToMenu() {
+            isGameActive = false;
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-info-bar').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            closeModal();
+        }
+
+        function renderBoard() {
+            for (let i = 0; i < 9; i++) {
+                const cell = document.getElementById(`cell-${i}`);
+                cell.innerText = boardState[i] || '';
+
+                cell.className = "cell-btn w-full h-full bg-white rounded-xl text-5xl sm:text-6xl font-black flex items-center justify-center shadow leading-none border-2 border-transparent select-none cursor-pointer";
+
+                if (boardState[i] === 'X') {
+                    cell.classList.add('text-sky-600');
+                } else if (boardState[i] === 'O') {
+                    cell.classList.add('text-rose-500');
+                }
+
+                if (winningComboIndices.includes(i)) {
+                    cell.classList.add('bg-amber-100', 'border-amber-400', 'animate-winning-line');
+                } else if (i === activeCellIndex) {
+                    cell.classList.add('border-amber-400', 'ring-4', 'ring-amber-200');
+                }
+
+                cell.disabled = !isGameActive || boardState[i] !== null || (selectedMode === 'vs-computer' && currentPlayer === 'O');
+            }
+        }
+
+        function handleCellClick(index) {
+            if (!isGameActive || boardState[index] !== null) return;
+            if (selectedMode === 'vs-computer' && currentPlayer === 'O') return;
+
+            activeCellIndex = index;
+            renderBoard();
+            resetHearts();
+            loadReadingTask();
+            hideTaskPanelOverlay(true);
+        }
+
+        function restartGame() {
+            closeModal();
+            boardState = Array(9).fill(null);
+            currentPlayer = 'X';
+            activeCellIndex = null;
+            winningComboIndices = [];
+            isGameActive = true;
+            
+            resetHearts();
+            renderBoard();
+            updateTurnIndicator();
+            hideTaskPanelOverlay(false);
+            hideFeedbackBanner();
+        }
+
+        function loadReadingTask() {
+            // Check if current level queue is empty, if so reload and shuffle all sentences for this level
+            if (!levelQueues[selectedLevel] || levelQueues[selectedLevel].length === 0) {
+                const levelKey = `level${selectedLevel}`;
+                levelQueues[selectedLevel] = [...SENTENCES_DB[levelKey]].sort(() => Math.random() - 0.5);
+            }
+
+            // Draw next sentence from the non-repeating queue
+            currentChallenge = levelQueues[selectedLevel].pop();
+
+            document.getElementById('sentence-text').innerText = currentChallenge.sentence;
+
+            // Show "Finished reading" button first and hide options
+            document.getElementById('finished-reading-wrapper').classList.remove('hidden');
+            document.getElementById('images-selection-wrapper').classList.add('hidden');
+
+            hideFeedbackBanner();
+        }
+
+        function showImageOptions() {
+            document.getElementById('finished-reading-wrapper').classList.add('hidden');
+            document.getElementById('images-selection-wrapper').classList.remove('hidden');
+
+            const options = [
+                { img: currentChallenge.correct, isCorrect: true },
+                { img: currentChallenge.dist1, isCorrect: false },
+                { img: currentChallenge.dist2, isCorrect: false }
+            ];
+            
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card bg-white border-2 border-slate-200 rounded-2xl hover:border-amber-400 hover:shadow-xl transition group aspect-square cursor-pointer overflow-hidden p-0 relative w-full h-full';
+                btn.onclick = () => handleOptionSelection(opt.isCorrect, btn);
+
+                btn.innerHTML = `
+                    <img src="${opt.img}" alt="תמונה" class="option-card-img group-hover:scale-105 transition duration-200" onerror="this.src='https://placehold.co/200x200/e2e8f0/475569?text=תמונה'"/>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function resetHearts() {
+            livesLeft = 2;
+            document.getElementById('heart-1').className = "fa-solid fa-heart text-rose-500 text-lg sm:text-xl transition";
+            document.getElementById('heart-2').className = "fa-solid fa-heart text-rose-500 text-lg sm:text-xl transition";
+        }
+
+        function deductHeart() {
+            livesLeft--;
+            if (livesLeft === 1) {
+                document.getElementById('heart-2').className = "fa-solid fa-heart text-slate-300 text-lg sm:text-xl transition scale-90";
+            } else if (livesLeft === 0) {
+                document.getElementById('heart-1').className = "fa-solid fa-heart text-slate-300 text-lg sm:text-xl transition scale-90";
+            }
+        }
+
+        function handleOptionSelection(isCorrect, btnElement) {
+            if (activeCellIndex === null || !isGameActive) return;
+
+            if (isCorrect) {
+                playAudioFeedback(true);
+                btnElement.classList.add('border-emerald-500', 'bg-emerald-50', 'ring-2', 'ring-emerald-200');
+                showFeedbackBanner('כל הכבוד! נכון! 🎉', 'bg-emerald-100 text-emerald-800 border-emerald-300');
+
+                setTimeout(() => {
+                    makeMove(activeCellIndex, currentPlayer);
+                }, 800);
+
+            } else {
+                deductHeart();
+                playAudioFeedback(false);
+                btnElement.classList.add('animate-shake', 'border-rose-400', 'bg-rose-50', 'opacity-50');
+                btnElement.disabled = true;
+
+                if (livesLeft > 0) {
+                    showFeedbackBanner('נסה שוב! 💪', 'bg-amber-100 text-amber-800 border-amber-300');
+                } else {
+                    showFeedbackBanner('התור עובר לאחר 🔄', 'bg-rose-100 text-rose-800 border-rose-300');
+                    setTimeout(() => {
+                        switchTurn();
+                    }, 1200);
+                }
+            }
+        }
+
+        function makeMove(cellIdx, player) {
+            boardState[cellIdx] = player;
+            activeCellIndex = null;
+            renderBoard();
+            hideTaskPanelOverlay(false);
+
+            const winningLine = getWinningCombo(player);
+            if (winningLine) {
+                winningComboIndices = winningLine;
+                renderBoard();
+                // Blink winning line for exactly 5 seconds before showing modal
+                setTimeout(() => {
+                    endGame(player);
+                }, 5000);
+                return;
+            }
+
+            if (boardState.every(cell => cell !== null)) {
+                endGame('draw');
+                return;
+            }
+
+            switchTurn();
+        }
+
+        function switchTurn() {
+            activeCellIndex = null;
+            hideTaskPanelOverlay(false);
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            updateTurnIndicator();
+            renderBoard();
+
+            if (selectedMode === 'vs-computer' && currentPlayer === 'O' && isGameActive) {
+                setTimeout(handleComputerTurn, 700);
+            }
+        }
+
+        function updateTurnIndicator() {
+            const indicator = document.getElementById('turn-indicator');
+            if (selectedMode === 'vs-computer') {
+                if (currentPlayer === 'X') {
+                    indicator.innerHTML = `<span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-block"></span> תורך (X)`;
+                } else {
+                    indicator.innerHTML = `<span class="w-3.5 h-3.5 rounded-full bg-rose-500 inline-block animate-ping"></span> תור המחשב...`;
+                }
+            } else {
+                if (currentPlayer === 'X') {
+                    indicator.innerHTML = `<span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-block"></span> שחקן 1 (X)`;
+                } else {
+                    indicator.innerHTML = `<span class="w-3.5 h-3.5 rounded-full bg-rose-500 inline-block"></span> שחקן 2 (O)`;
+                }
+            }
+        }
+
+        function handleComputerTurn() {
+            if (!isGameActive) return;
+
+            const emptyIndices = boardState
+                .map((val, idx) => val === null ? idx : null)
+                .filter(val => val !== null);
+
+            if (emptyIndices.length === 0) return;
+
+            let chosenIndex = findBestMove('O') || findBestMove('X') || emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+            makeMove(chosenIndex, 'O');
+        }
+
+        function findBestMove(player) {
+            for (let combo of WINNING_COMBOS) {
+                const [a, b, c] = combo;
+                const values = [boardState[a], boardState[b], boardState[c]];
+                if (values.filter(v => v === player).length === 2 && values.includes(null)) {
+                    return combo[values.indexOf(null)];
+                }
+            }
+            return null;
+        }
+
+        function getWinningCombo(player) {
+            return WINNING_COMBOS.find(combo => combo.every(idx => boardState[idx] === player)) || null;
+        }
+
+        function endGame(result) {
+            isGameActive = false;
+            const modal = document.getElementById('modal-screen');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+            const icon = document.getElementById('modal-icon');
+
+            if (result === 'draw') {
+                icon.innerText = '🤝';
+                icon.className = 'w-18 h-18 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 bg-amber-100 shadow-lg';
+                title.innerText = 'תיקו מותח!';
+                desc.innerText = 'שניכם קראתם נהדר!';
+            } else if (result === 'X') {
+                icon.innerText = '🏆';
+                icon.className = 'w-18 h-18 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 bg-emerald-100 shadow-lg';
+                title.innerText = selectedMode === 'vs-computer' ? 'ניצחת את המחשב!' : 'שחקן 1 ניצח!';
+                desc.innerText = 'כל הכבוד, אלופי הקריאה!';
+            } else {
+                icon.innerText = selectedMode === 'vs-computer' ? '🤖' : '🎉';
+                icon.className = 'w-18 h-18 rounded-full mx-auto flex items-center justify-center text-4xl mb-3 bg-rose-100 shadow-lg';
+                title.innerText = selectedMode === 'vs-computer' ? 'המחשב ניצח!' : 'שחקן 2 ניצח!';
+                desc.innerText = 'משחק מעולה!';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-screen').classList.add('hidden');
+        }
+
+        function hideTaskPanelOverlay(showTask) {
+            const placeholder = document.getElementById('task-placeholder');
+            if (showTask) {
+                placeholder.classList.add('hidden');
+            } else {
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        function showFeedbackBanner(msg, colorClasses) {
+            const banner = document.getElementById('feedback-banner');
+            banner.innerText = msg;
+            banner.className = `my-2.5 p-3 rounded-xl text-center font-bold text-lg border ${colorClasses} animate-pop-in`;
+            banner.classList.remove('hidden');
+        }
+
+        function hideFeedbackBanner() {
+            document.getElementById('feedback-banner').classList.add('hidden');
+        }
+
+        function playAudioFeedback(isSuccess) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (isSuccess) {
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, ctx.currentTime + 0.25);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                } else {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch(e) {}
+        }
+
+        function speakCurrentSentence() {
+            if (!currentChallenge) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanText = currentChallenge.sentence.replace(/[\u0591-\u05C7]/g, ""); 
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'he-IL';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+
+</body></html>
